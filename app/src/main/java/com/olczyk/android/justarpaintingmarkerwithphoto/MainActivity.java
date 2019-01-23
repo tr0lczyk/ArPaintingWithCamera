@@ -31,6 +31,7 @@ import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
+import com.google.ar.sceneform.rendering.DpToMetersViewSizer;
 import com.google.ar.sceneform.rendering.ViewRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private ArFragment arFragment;
     private FloatingActionButton photoFab;
     boolean shouldAddModel = true;
+    float width;
+    float height;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
         for (AugmentedImage augmentedImage : augmentedImages) {
             if (augmentedImage.getTrackingState() == TrackingState.TRACKING) {
                 if (augmentedImage.getName().equals("tiger") && shouldAddModel) {
+                    width = augmentedImage.getExtentX();
+                    height = augmentedImage.getExtentZ();
                     placeImageView(arFragment,augmentedImage.createAnchor(augmentedImage.getCenterPose()));
                     shouldAddModel = false;
                 }
@@ -87,10 +92,13 @@ public class MainActivity extends AppCompatActivity {
                             AnchorNode anchorNode = new AnchorNode(anchor);
                             anchorNode.setParent(arFragment.getArSceneView().getScene());
                             TransformableNode transNode = new TransformableNode(arFragment.getTransformationSystem());
-                            transNode.setParent(anchorNode);
                             transNode.setRenderable(renderable);
+                            transNode.getScaleController().setMinScale(0.01f);
+                            transNode.getScaleController().setMaxScale(2.0f);
+                            transNode.setLocalScale(new Vector3(width,0,height));
                             transNode.setLocalPosition(new Vector3(0,0.5f,0));
                             transNode.setLocalRotation(Quaternion.axisAngle(new Vector3(1,0,0),-90));
+                            transNode.setParent(anchorNode);
                             transNode.select();
                         });
     }
@@ -144,14 +152,12 @@ public class MainActivity extends AppCompatActivity {
         final String filename = generateFilename();
         ArSceneView view = arFragment.getArSceneView();
 
-        // Create a bitmap the size of the scene view.
         final Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),
                 Bitmap.Config.ARGB_8888);
 
-        // Create a handler thread to offload the processing of the image.
         final HandlerThread handlerThread = new HandlerThread("PixelCopier");
         handlerThread.start();
-        // Make the request to copy.
+
         PixelCopy.request(view, bitmap, (copyResult) -> {
             if (copyResult == PixelCopy.SUCCESS) {
                 try {
@@ -168,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                     File photoFile = new File(filename);
 
                     Uri photoURI = FileProvider.getUriForFile(MainActivity.this,
-                            MainActivity.this.getPackageName() + ".ar.codelab.name.provider",
+                            MainActivity.this.getPackageName() + ".olczyk.android.justarpaintingmarkerwithphoto",
                             photoFile);
                     Intent intent = new Intent(Intent.ACTION_VIEW, photoURI);
                     intent.setDataAndType(photoURI, "image/*");
