@@ -88,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
                         .setVerticalAlignment(ViewRenderable.VerticalAlignment.CENTER)
                         .build()
                         .thenAccept(renderable -> {
+                            float scaledWidth = (float) (width*0.61);
+                            float scaledHeight = (float) (height*0.61);
                             ImageView imageView = (ImageView) renderable.getView();
                             AnchorNode anchorNode = new AnchorNode(anchor);
                             anchorNode.setParent(arFragment.getArSceneView().getScene());
@@ -95,8 +97,8 @@ public class MainActivity extends AppCompatActivity {
                             transNode.setRenderable(renderable);
                             transNode.getScaleController().setMinScale(0.01f);
                             transNode.getScaleController().setMaxScale(2.0f);
-                            transNode.setLocalScale(new Vector3(width,0,height));
-                            transNode.setLocalPosition(new Vector3(0,0.5f,0));
+                            transNode.setLocalScale(new Vector3(scaledWidth,0,scaledHeight));
+                            transNode.setLocalPosition(new Vector3(0,0.1f,0));
                             transNode.setLocalRotation(Quaternion.axisAngle(new Vector3(1,0,0),-90));
                             transNode.setParent(anchorNode);
                             transNode.select();
