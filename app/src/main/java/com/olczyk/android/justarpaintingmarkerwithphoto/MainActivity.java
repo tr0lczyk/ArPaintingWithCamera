@@ -18,7 +18,6 @@ import android.util.Log;
 import android.view.PixelCopy;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.google.ar.core.Anchor;
 import com.google.ar.core.AugmentedImage;
 import com.google.ar.core.AugmentedImageDatabase;
@@ -31,11 +30,9 @@ import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.DpToMetersViewSizer;
 import com.google.ar.sceneform.rendering.ViewRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -71,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         Collection<AugmentedImage> augmentedImages = frame.getUpdatedTrackables(AugmentedImage.class);
         for (AugmentedImage augmentedImage : augmentedImages) {
             if (augmentedImage.getTrackingState() == TrackingState.TRACKING) {
-                if (augmentedImage.getName().equals("tiger") && shouldAddModel) {
+                if (augmentedImage.getName().equals("painting") && shouldAddModel) {
                     width = augmentedImage.getExtentX();
                     height = augmentedImage.getExtentZ();
                     placeImageView(arFragment,augmentedImage.createAnchor(augmentedImage.getCenterPose()));
@@ -88,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
                         .setVerticalAlignment(ViewRenderable.VerticalAlignment.CENTER)
                         .build()
                         .thenAccept(renderable -> {
-                            float scaledWidth = (float) (width*0.61);
-                            float scaledHeight = (float) (height*0.61);
+                            float scaledWidth = (float) (width * 0.8);
+                            float scaledHeight = (float) (height * 0.8);
                             ImageView imageView = (ImageView) renderable.getView();
                             AnchorNode anchorNode = new AnchorNode(anchor);
                             anchorNode.setParent(arFragment.getArSceneView().getScene());
@@ -97,8 +94,8 @@ public class MainActivity extends AppCompatActivity {
                             transNode.setRenderable(renderable);
                             transNode.getScaleController().setMinScale(0.01f);
                             transNode.getScaleController().setMaxScale(2.0f);
-                            transNode.setLocalScale(new Vector3(scaledWidth,0,scaledHeight));
-                            transNode.setLocalPosition(new Vector3(0,0.1f,0));
+                            transNode.setLocalScale(new Vector3(scaledWidth,scaledHeight,scaledWidth));
+                            transNode.setLocalPosition(new Vector3(0,0.0f,0));
                             transNode.setLocalRotation(Quaternion.axisAngle(new Vector3(1,0,0),-90));
                             transNode.setParent(anchorNode);
                             transNode.select();
@@ -112,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
         augmentedImageDatabase = new AugmentedImageDatabase(session);
-        augmentedImageDatabase.addImage("tiger", bitmap);
+        augmentedImageDatabase.addImage("painting", bitmap);
         config.setAugmentedImageDatabase(augmentedImageDatabase);
         return true;
     }
