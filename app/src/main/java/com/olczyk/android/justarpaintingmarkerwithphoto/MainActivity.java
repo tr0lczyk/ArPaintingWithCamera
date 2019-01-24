@@ -3,6 +3,7 @@ package com.olczyk.android.justarpaintingmarkerwithphoto;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -126,8 +127,7 @@ public class MainActivity extends AppCompatActivity {
     private String generateFilename() {
         String date =
                 new SimpleDateFormat("yyyyMMddHHmmss", java.util.Locale.getDefault()).format(new Date());
-        return Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES) + File.separator + "Sceneform/" + date + "_screenshot.jpg";
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + File.separator + "Sceneform/" + date + "_screenshot.jpg";
     }
 
     private void saveBitmapToDisk(Bitmap bitmap, String filename) throws IOException {
@@ -145,6 +145,11 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException ex) {
             throw new IOException("Failed to save bitmap to disk", ex);
         }
+        MediaScannerConnection.scanFile(this,
+                new String[]
+                        { out.getPath() },
+                new String[]
+                        { "image/jpeg" }, null);
     }
 
     private void takePhoto() {
@@ -173,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                     File photoFile = new File(filename);
 
                     Uri photoURI = FileProvider.getUriForFile(MainActivity.this,
-                            MainActivity.this.getPackageName() + ".olczyk.android.justarpaintingmarkerwithphoto",
+                            MainActivity.this.getPackageName() + ".ar.codelab.name.provider",
                             photoFile);
                     Intent intent = new Intent(Intent.ACTION_VIEW, photoURI);
                     intent.setDataAndType(photoURI, "image/*");
